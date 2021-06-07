@@ -21,7 +21,7 @@
 typedef struct ThreadPool ThreadPool;
 
 // 创建线程池
-ThreadPool* CreateThreadPool(int minNumThreads, int maxNumThreads_, int queueSize_);
+ThreadPool *CreateThreadPool(int minNumThreads, int maxNumThreads_, int queueSize_);
 
 
 // 销毁线程池
@@ -33,10 +33,15 @@ ThreadPool* CreateThreadPool(int minNumThreads, int maxNumThreads_, int queueSiz
 // 获取线程池中活着的线程池
 
 
-_Noreturn void* worker(void* arg);
+_Noreturn void *worker(void *arg);
 
-void* manager(void* arg);
+void *manager(void *arg);
 
-void* threadExit(ThreadPool* pool);
+void *threadExit(ThreadPool *pool);
+
+
+// 给线程池添加任务
+void threadPoollAdd(ThreadPool *pool, void(*func)(void *), void *arg);
+
 
 #endif //C_THREADPOOL_THREADPOOL_H

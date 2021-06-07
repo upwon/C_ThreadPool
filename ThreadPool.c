@@ -195,6 +195,7 @@ _Noreturn void *worker(void *arg)
         pool->queueFront = (pool->queueFront + 1) % pool->queueCapacity;
         pool->queueSize--;
 
+        pthread_cond_signal(&pool->notFull);   // 唤醒生产者
 
         pthread_mutex_unlock(&pool->mutexPool);  // 解锁
 
@@ -301,3 +302,38 @@ void *threadExit(ThreadPool *pool)
 
 
 }
+
+
+// 给线程池添加任务
+void threadPoollAdd(ThreadPool *pool, void(*func)(void *), void *arg)
+{
+    pthread_mutex_lock(&pool->mutexPool);
+
+    // 生产者 阻塞 当容量满了 并且 没有销毁线程池
+    while(pool->queueSize==pool->queueCapacity&&!pool->shutdownThreadPool)
+    {
+
+        // 阻塞生产者线程
+        pthread_cond_wait(&pool->notFull,&pool->mutexPool);
+
+    }
+
+    if(pool->shutdownThreadPool)
+    {
+        pthread_mutex_unlock(&pool->mutexPool);
+        return;
+    }
+
+    // 添加任务
+    pool->taskQueue[pool->queueRear].functions=func;
+    pool->taskQueue[pool->queueRear].arg=arg;
+    pool->queueRear=(pool->queueRear+1)%pool->queueCapacity;  // 环形队列
+    pool->queueSize++;
+
+
+    pthread_cond_signal(&pool->notEmpty);   // 唤醒消费者
+    pthread_mutex_unlock(&pool->mutexPool);
+
+}
+
+
