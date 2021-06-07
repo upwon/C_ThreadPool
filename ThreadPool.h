@@ -33,9 +33,10 @@ ThreadPool* CreateThreadPool(int minNumThreads, int maxNumThreads_, int queueSiz
 // 获取线程池中活着的线程池
 
 
-void* worker(void* arg);
+_Noreturn void* worker(void* arg);
 
 void* manager(void* arg);
 
+void* threadExit(ThreadPool* pool);
 
 #endif //C_THREADPOOL_THREADPOOL_H
