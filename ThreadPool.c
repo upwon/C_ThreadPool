@@ -19,6 +19,7 @@
 #include<stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 // 任务结构体
 typedef struct Task
 {
@@ -91,7 +92,7 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
         pool->destroyNumThreads = 0;
 
         // 初始化互斥锁与条件量
-        if (pthrad_mutex_ini(&pool->mutexpool,NULL) != 0 || pthread_mutex_init(&pool->mutexBusy, NULL) != 0 ||
+        if (pthread_mutex_init(&pool->mutexPool,NULL) != 0 || pthread_mutex_init(&pool->mutexBusy, NULL) != 0 ||
             pthread_cond_init(&pool->notFull, NULL) != 0 || pthread_cond_init(&pool->notFull, NULL) != 0)
         {
             printf("mutex or pthread_cond  initialization failure \n");
@@ -99,7 +100,7 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
         }
 
         // 初始化任务队列
-        pool->taskQueue =(taskQueue*) malloc(sizeof(Task) * queueSize_);
+        pool->taskQueue =(Task*) malloc(sizeof(taskQueue) * queueSize_);
         pool->queueCapacity = queueSize_;
         pool->queueSize = queueSize_;
         pool->queueFront = 0;
