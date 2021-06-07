@@ -131,3 +131,17 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
 
 
 }
+
+
+void* worker(void* arg)
+{
+    ThreadPool* pool = (ThreadPool*) arg;
+
+    while(true)
+    {
+
+
+    }
+
+
+}
