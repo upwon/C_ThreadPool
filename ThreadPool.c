@@ -100,7 +100,7 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
         }
 
         // 初始化任务队列
-        pool->taskQueue =(Task*) malloc(sizeof(taskQueue) * queueSize_);
+        pool->taskQueue =(Task*) malloc(sizeof(Task) * queueSize_);
         pool->queueCapacity = queueSize_;
         pool->queueSize = queueSize_;
         pool->queueFront = 0;
