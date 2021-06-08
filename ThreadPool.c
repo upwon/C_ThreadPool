@@ -105,7 +105,7 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
         // 初始化任务队列
         pool->taskQueue = (Task *) malloc(sizeof(Task) * queueSize_);
         pool->queueCapacity = queueSize_;
-        pool->queueSize = queueSize_;
+        pool->queueSize = 0;
         pool->queueFront = 0;
         pool->queueRear = 0;
 
@@ -305,7 +305,7 @@ void *threadExit(ThreadPool *pool)
 
 
 // 给线程池添加任务
-void threadPoollAdd(ThreadPool *pool, void(*func)(void *), void *arg)
+void threadPoolAdd(ThreadPool *pool, void(*func)(void *), void *arg)
 {
     pthread_mutex_lock(&pool->mutexPool);
 
