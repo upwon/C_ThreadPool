@@ -40,7 +40,7 @@ _Noreturn void *worker(void *arg);
 
 void *manager(void *arg);
 
-void *threadExit(ThreadPool *pool);
+void threadExit(ThreadPool *pool);
 
 
 // 给线程池添加任务

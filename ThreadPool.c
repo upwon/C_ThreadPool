@@ -59,7 +59,6 @@ struct ThreadPool
     pthread_cond_t notFull; // 任务队列是不是满了
     pthread_cond_t notEmpty; // 任务队列是不是空了
 
-
     // 销毁线程标志
     bool shutdownThreadPool; //true表示销毁线程
 
@@ -246,6 +245,8 @@ void *manager(void *arg)
         pthread_mutex_lock(&pool->mutexPool);
         int queueSize = pool->queueSize;
         int liveNum = pool->liveNumThreads;
+        int maxNumThreads=pool->maxNumThreads;
+        int minNumThreads=pool->minNumThreads;
         pthread_mutex_unlock(&pool->mutexPool);
 
         // 取出忙的线程的数量
@@ -255,11 +256,11 @@ void *manager(void *arg)
 
         // 添加线程算法
         // 任务的个数>存活的线程个数 && 存活的线程数< 最大线程数
-        if (queueSize > liveNum && liveNum < pool->maxNumThreads)
+        if (queueSize > liveNum && liveNum < maxNumThreads)
         {
             pthread_mutex_lock(&pool->mutexPool);
             int counter = 0;
-            for (int i = 0; i < pool->maxNumThreads && counter < NUMBER && liveNum < pool->maxNumThreads; i++)
+            for (int i = 0; i < maxNumThreads && counter < NUMBER && liveNum < maxNumThreads; i++)
             {
                 if (pool->threadIDs[i] == 0)  // 找到空位 即 数组中空闲的位置
                 {
@@ -275,7 +276,7 @@ void *manager(void *arg)
 
         // 销毁线程算法
         // 忙的线程*2 < 存活的线程个数 && 存活的线程 > 最小线程数
-        if (busyNum * 2 < liveNum && liveNum > pool->minNumThreads)
+        if (busyNum * 2 < liveNum && liveNum > minNumThreads)
         {
             pthread_mutex_lock(&pool->mutexPool);
 
@@ -293,12 +294,14 @@ void *manager(void *arg)
 
 
     }
+
+    return NULL;
 }
 
 /// 线程退出时 更改数组中的值为0  作为记录
 /// \param pool
 /// \return
-void *threadExit(ThreadPool *pool)
+void threadExit(ThreadPool *pool)
 {
     pthread_t tid = pthread_self();
 
@@ -308,6 +311,7 @@ void *threadExit(ThreadPool *pool)
         {
             pool->threadIDs[i] = 0;
             printf("threadExit() called , %ld exiting --- \n", tid);
+            break;
         }
     }
 
@@ -380,13 +384,19 @@ int threadPoolDestroy(ThreadPool *pool)
     {
         return -1;   // 对于空的 pool
     }
+
+    pthread_mutex_lock(&pool->mutexPool);
     // 关闭线程池
     pool->shutdownThreadPool=true;
+    int liveNumThreads=pool->liveNumThreads;
+    pthread_mutex_unlock(&pool->mutexPool);
+
+
     // 阻塞回收管理线程
     pthread_join(pool->threadManagerID, NULL);
 
     // 唤醒阻塞的消费者线程ID
-    for (int i = 0; i < pool->liveNumThreads; i++)
+    for (int i = 0; i <  liveNumThreads; i++)
     {
         pthread_cond_signal(&pool->notEmpty);
     }
@@ -416,5 +426,5 @@ int threadPoolDestroy(ThreadPool *pool)
 
 
 
-    return 1;
+    return 0;
 }
