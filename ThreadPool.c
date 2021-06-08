@@ -163,7 +163,7 @@ _Noreturn void *worker(void *arg)
 
                 pool->destroyNumThreads--;
 
-                if(pool->liveNumThreads>pool->minNumThreads)
+                if (pool->liveNumThreads > pool->minNumThreads)
                 {
                     pool->liveNumThreads--;
                     pthread_mutex_unlock(&pool->mutexPool);
@@ -183,7 +183,7 @@ _Noreturn void *worker(void *arg)
             pthread_mutex_unlock(&pool->mutexPool);
 
             //pthread_exit(NULL);
-            threadExit( pool);
+            threadExit(pool);
         }
 
         // 从任务队列中取出一个任务
@@ -216,7 +216,7 @@ _Noreturn void *worker(void *arg)
         pthread_mutex_unlock(&pool->mutexBusy);
     }
 
-  //  return NULL;
+    //  return NULL;
 }
 
 void *manager(void *arg)
@@ -310,24 +310,24 @@ void threadPoollAdd(ThreadPool *pool, void(*func)(void *), void *arg)
     pthread_mutex_lock(&pool->mutexPool);
 
     // 生产者 阻塞 当容量满了 并且 没有销毁线程池
-    while(pool->queueSize==pool->queueCapacity&&!pool->shutdownThreadPool)
+    while (pool->queueSize == pool->queueCapacity && !pool->shutdownThreadPool)
     {
 
         // 阻塞生产者线程
-        pthread_cond_wait(&pool->notFull,&pool->mutexPool);
+        pthread_cond_wait(&pool->notFull, &pool->mutexPool);
 
     }
 
-    if(pool->shutdownThreadPool)
+    if (pool->shutdownThreadPool)
     {
         pthread_mutex_unlock(&pool->mutexPool);
         return;
     }
 
     // 添加任务
-    pool->taskQueue[pool->queueRear].functions=func;
-    pool->taskQueue[pool->queueRear].arg=arg;
-    pool->queueRear=(pool->queueRear+1)%pool->queueCapacity;  // 环形队列
+    pool->taskQueue[pool->queueRear].functions = func;
+    pool->taskQueue[pool->queueRear].arg = arg;
+    pool->queueRear = (pool->queueRear + 1) % pool->queueCapacity;  // 环形队列
     pool->queueSize++;
 
 
@@ -337,3 +337,66 @@ void threadPoollAdd(ThreadPool *pool, void(*func)(void *), void *arg)
 }
 
 
+int threadPoolLiveNum(ThreadPool *pool)
+{
+    pthread_mutex_lock(&pool->mutexBusy);
+
+    int busyNum = pool->busyNumThreads;
+
+    pthread_mutex_unlock(&pool->mutexBusy);
+    return busyNum;
+}
+
+
+int threadPoolWorkNum(ThreadPool *pool)
+{
+
+    pthread_mutex_lock(&pool->mutexPool);
+    int workNum = pool->liveNumThreads;   // 关闭线程
+
+    pthread_mutex_unlock(&pool->mutexPool);
+    return workNum;
+
+}
+
+
+int threadPoolDestroy(ThreadPool *pool)
+{
+    if (pool == NULL)
+    {
+        return -1;   // 对于空的 pool
+    }
+    // 阻塞回收管理线程
+    pthread_join(pool->threadManagerID, NULL);
+
+    // 唤醒阻塞的消费者线程ID
+    for (int i = 0; i < pool->liveNumThreads; i++)
+    {
+        pthread_cond_signal(&pool->notEmpty);
+    }
+
+    // 释放堆区
+    if (pool->taskQueue)
+    {
+        free(pool->taskQueue);
+        pool->taskQueue = NULL;
+    }
+    if (pool->threadIDs)
+    {
+        free(pool->threadIDs);
+        pool->threadIDs = NULL;
+    }
+
+    // 释放互斥锁以及条件变量
+    pthread_mutex_destroy(&pool->mutexPool);
+    pthread_mutex_destroy(&pool->mutexBusy);
+
+    pthread_cond_destroy(&pool->notEmpty);
+    pthread_cond_destroy(&pool->notFull);
+
+
+    free(pool);
+    pool = NULL;
+
+    return 1;
+}

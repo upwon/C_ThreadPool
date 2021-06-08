@@ -25,13 +25,16 @@ ThreadPool *CreateThreadPool(int minNumThreads, int maxNumThreads_, int queueSiz
 
 
 // 销毁线程池
+int threadPoolDestroy(ThreadPool * pool);
+
 
 // 添加任务至线程池
 
 // 获取线程池中的工作线程
+int threadPoolWorkNum(ThreadPool* pool);
 
 // 获取线程池中活着的线程池
-
+int threadPoolLiveNum(ThreadPool* pool);
 
 _Noreturn void *worker(void *arg);
 
