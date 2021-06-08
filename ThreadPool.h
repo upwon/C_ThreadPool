@@ -44,7 +44,7 @@ void *threadExit(ThreadPool *pool);
 
 
 // 给线程池添加任务
-void threadPoollAdd(ThreadPool *pool, void(*func)(void *), void *arg);
+void threadPoolAdd(ThreadPool *pool, void(*func)(void *), void *arg);
 
 
 #endif //C_THREADPOOL_THREADPOOL_H
