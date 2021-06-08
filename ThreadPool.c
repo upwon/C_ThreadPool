@@ -130,14 +130,17 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
     if (pool && pool->threadIDs)
     {
         free(pool->threadIDs);
+        pool->threadIDs=NULL;
     }
     if (pool && pool->taskQueue)
     {
         free(pool->taskQueue);
+        pool->taskQueue=NULL;
     }
     if(pool)
     {
         free(pool);
+        pool=NULL;
     }
 
     return NULL;
