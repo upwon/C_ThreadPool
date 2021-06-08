@@ -5,5 +5,4 @@ set(CMAKE_C_STANDARD 11  )
 
 set(CMAKE_C_FLAGS -pthread)
 
-
 add_executable(C_ThreadPool main.c ThreadPool.c ThreadPool.h)
