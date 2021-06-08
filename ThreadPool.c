@@ -377,7 +377,8 @@ int threadPoolDestroy(ThreadPool *pool)
     {
         return -1;   // 对于空的 pool
     }
-    
+    // 关闭线程池
+    pool->shutdownThreadPool=true;
     // 阻塞回收管理线程
     pthread_join(pool->threadManagerID, NULL);
 
@@ -409,6 +410,8 @@ int threadPoolDestroy(ThreadPool *pool)
 
     free(pool);
     pool = NULL;
+
+
 
     return 1;
 }

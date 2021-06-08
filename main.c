@@ -33,6 +33,7 @@ int main()
     threadPoolDestroy(pool);
 
 
+    printf("-------exit---------------\n");
     printf("Hello, World!\n");
     return 0;
 }
