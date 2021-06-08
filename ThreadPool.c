@@ -73,7 +73,7 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
 
     do
     {
-        if (pool == NULL)
+        if (pool == NULL)  // 内存分配失败
         {
             printf("malloc threadpool failure \n");
             break;
@@ -113,11 +113,16 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
 
 
         // 创建线程
-        pthread_create(&pool->threadManagerID, NULL, manager, pool);    // 创建管理者线程
+       int ret= pthread_create(&pool->threadManagerID, NULL, manager, pool);    // 创建管理者线程
+       printf("create manmager thread , ret=%d\n", ret);
         for (int i = 0; i < pool->minNumThreads; i++)   // 创建工作线程
         {
-            pthread_create(&pool->threadIDs[i], NULL, worker, pool);
+           int ret= pthread_create(&pool->threadIDs[i], NULL, worker, pool);
+            printf("create work thread %d , ret=%d\n",i, ret);
+
         }
+
+        return pool;
 
     } while (0);
 
@@ -130,7 +135,12 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
     {
         free(pool->taskQueue);
     }
+    if(pool)
+    {
+        free(pool);
+    }
 
+    return NULL;
 
 }
 
@@ -332,6 +342,7 @@ void threadPoolAdd(ThreadPool *pool, void(*func)(void *), void *arg)
 
 
     pthread_cond_signal(&pool->notEmpty);   // 唤醒消费者
+
     pthread_mutex_unlock(&pool->mutexPool);
 
 }
@@ -366,6 +377,7 @@ int threadPoolDestroy(ThreadPool *pool)
     {
         return -1;   // 对于空的 pool
     }
+    
     // 阻塞回收管理线程
     pthread_join(pool->threadManagerID, NULL);
 

@@ -8,7 +8,7 @@ void taskFunc(void *arg)
 {
     int num=*(int*)arg; //转换后取值
 
-    printf("thread %ld is working, number= %d",pthread_self(),num);
+    printf("thread %ld is working, number= %d \n",pthread_self(),num);
 
     sleep(1);
 }
@@ -23,9 +23,11 @@ int main()
     {
         int* num=(int*)malloc(sizeof(int));
         *num=i+100;
+
         threadPoolAdd(pool,taskFunc,num);
     }
 
+   // free(num);
 
     sleep(30);  // 睡眠30秒
     threadPoolDestroy(pool);
