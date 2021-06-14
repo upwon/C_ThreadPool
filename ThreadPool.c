@@ -217,7 +217,7 @@ _Noreturn void *worker(void *arg)
         pool->busyNumThreads++;
         pthread_mutex_unlock(&pool->mutexBusy);
 
-        task.function(arg);    // 工作
+        task.function(task.arg);    // 工作
         free(task.arg);
         task.arg = NULL;
 
