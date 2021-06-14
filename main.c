@@ -9,6 +9,7 @@ void taskFunc(void *arg)
   //  int num=*(int*)arg; //转换后取值
     int num=*(int*)arg;
 
+
     printf("thread %ld is working, number= %d \n",pthread_self(),num);
 
     sleep(1);
@@ -16,14 +17,26 @@ void taskFunc(void *arg)
 
 int main()
 {
-/*
     // 创建线程池
     ThreadPool *pool = CreateThreadPool(3, 10, 100);
 
-    for (int i = 0; i < 100; i++)
-    {  int* num=(int*)malloc(sizeof(int));
+    int* ip = new int; //  1 allocates memory (4 bytes)
+    //  2 creates int
+    //  3 assigns its address to ip
+    *ip = 12345;
+    std::cout <<  *ip << std:endl;
 
-        *num=i+100;
+    delete ip;  // de-allocates memory (frees it)
+
+
+    for (int i = 0; i < 100; i++)
+    { // int* num=(int*)malloc(sizeof(int));
+
+      //  *num=i+100;
+     //   int* num=new int(i+100);
+        int* num = new int;
+             *num=   (i + 100);
+
         printf("----%d----\n",*num);
 
         threadPoolAdd(pool,taskFunc,num);
@@ -32,15 +45,15 @@ int main()
    // free(num);
 
     sleep(30);  // 睡眠30秒
-    threadPoolDestroy(pool);*/
+    threadPoolDestroy(pool);
 
 
-    int* num=(int*)malloc(sizeof(int));
+   /* int* num=(int*)malloc(sizeof(int));
 
     *num=100;
     taskFunc(num);
 
     printf("-------exit---------------\n");
-    printf("Hello, World!\n");
+    printf("Hello, World!\n");*/
     return 0;
 }

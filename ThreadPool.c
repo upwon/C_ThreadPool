@@ -95,7 +95,7 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
 
         // 初始化互斥锁与条件量
         if (pthread_mutex_init(&pool->mutexPool, NULL) != 0 || pthread_mutex_init(&pool->mutexBusy, NULL) != 0 ||
-            pthread_cond_init(&pool->notFull, NULL) != 0 || pthread_cond_init(&pool->notFull, NULL) != 0)
+            pthread_cond_init(&pool->notEmpty, NULL) != 0 || pthread_cond_init(&pool->notFull, NULL) != 0)
         {
             printf("mutex or pthread_cond  initialization failure \n");
             break;
