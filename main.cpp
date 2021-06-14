@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <pthread.h>
 #include"ThreadPool.h"
+#include"ThreadPool.c"
 #include <stdlib.h>
 #include <unistd.h>
+#include <iostream>
 
 void taskFunc(void *arg)
 {
@@ -23,10 +25,6 @@ int main()
     int* ip = new int; //  1 allocates memory (4 bytes)
     //  2 creates int
     //  3 assigns its address to ip
-    *ip = 12345;
-    std::cout <<  *ip << std:endl;
-
-    delete ip;  // de-allocates memory (frees it)
 
 
     for (int i = 0; i < 100; i++)
@@ -34,12 +32,13 @@ int main()
 
       //  *num=i+100;
      //   int* num=new int(i+100);
-        int* num = new int;
+        int* num = new int(i+100);
              *num=   (i + 100);
 
         printf("----%d----\n",*num);
 
         threadPoolAdd(pool,taskFunc,num);
+
     }
 
    // free(num);
