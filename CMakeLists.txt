@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.19)
-project(C_ThreadPool )
+project(C_ThreadPool C)
 
-set(CMAKE_XX_STANDARD 14 )
 
-set(CMAKE_XX_FLAGS -pthread)
+set(CMAKE_C_STANDARD 11  )
 
-add_executable(C_ThreadPool main.cpp ThreadPool.c ThreadPool.h)
+set(CMAKE_C_FLAGS -pthread)
+
+add_executable(C_ThreadPool main.c ThreadPool.c ThreadPool.h)

@@ -36,7 +36,7 @@ int threadPoolWorkNum(ThreadPool* pool);
 // 获取线程池中活着的线程池
 int threadPoolLiveNum(ThreadPool* pool);
 
-  void *worker(void *arg);
+_Noreturn void *worker(void *arg);
 
 void *manager(void *arg);
 
