@@ -26,7 +26,7 @@
 // 任务结构体
 typedef struct Task
 {
-    void (*functions)(void *arg);
+    void (*function)(void *arg);
 
     void *arg;
 } Task;
@@ -108,7 +108,7 @@ ThreadPool *CreateThreadPool(int minNumThreads_, int maxNumThreads_, int queueSi
         pool->queueFront = 0;
         pool->queueRear = 0;
 
-        pool->shutdownThreadPool = false; // 默认不销毁
+        pool->shutdownThreadPool = 0; // 默认不销毁
 
 
         // 创建线程
@@ -151,7 +151,7 @@ _Noreturn void *worker(void *arg)
 {
     ThreadPool *pool = (ThreadPool *) arg;
 
-    while (true)
+    while (1)
     {
         pthread_mutex_lock(&pool->mutexPool);    // 加锁
 
@@ -200,7 +200,7 @@ _Noreturn void *worker(void *arg)
 
         // 从任务队列中取出一个任务
         Task task;
-        task.functions = pool->taskQueue[pool->queueFront].functions;
+        task.function = pool->taskQueue[pool->queueFront].function;
         task.arg = pool->taskQueue[pool->queueFront].arg;
 
         // 移动头节点
@@ -217,7 +217,7 @@ _Noreturn void *worker(void *arg)
         pool->busyNumThreads++;
         pthread_mutex_unlock(&pool->mutexBusy);
 
-        task.functions(arg);    // 工作
+        task.function(arg);    // 工作
         free(task.arg);
         task.arg = NULL;
 
@@ -342,7 +342,7 @@ void threadPoolAdd(ThreadPool *pool, void(*func)(void *), void *arg)
     }
 
     // 添加任务
-    pool->taskQueue[pool->queueRear].functions = func;
+    pool->taskQueue[pool->queueRear].function= func;
     pool->taskQueue[pool->queueRear].arg = arg;
     pool->queueRear = (pool->queueRear + 1) % pool->queueCapacity;  // 环形队列
     pool->queueSize++;

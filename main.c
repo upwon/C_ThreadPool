@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+
 #include <pthread.h>
 #include"ThreadPool.h"
 #include <stdlib.h>
@@ -10,8 +12,9 @@ void taskFunc(void *arg)
     //  int num=*(int*)arg; //转换后取值
     int num = *(int *) arg;
 
-    printf("thread %ld is working, number= %d \n", pthread_self(), num);
-
+   // printf("thread %ld is working, number= %d \n", pthread_self(), num);
+    printf("thread %ld is working, number = %d\n",
+           pthread_self(), num);
     sleep(1);
 }
 
